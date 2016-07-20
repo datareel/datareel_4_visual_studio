@@ -1,0 +1,34 @@
+# Relational database table definition file
+
+DEFINE TABLE {
+testdb1,
+Item Name{25}    VCHAR[4],
+Stock Number{12} INT32,
+Price{15}        CURRENCY.D
+};
+
+DEFINE KEYS {
+PRI: COL 1,
+ATTRIB: NOCASE,
+ATTRIB: ANCOMPARE,
+ATTRIB: RECLAIM=FIRST,
+ATTRIB: ORDER=64
+};
+
+DEFINE FORM {
+NONE
+};
+
+DEFINE FKEY {
+Family Name.1, 
+Table Name[1:1|4:5|3:7],
+};
+
+DEFINE USER ACCESS {
+*.*
+};
+
+DEFINE GROUP ACCESS {
+*.*
+};
+

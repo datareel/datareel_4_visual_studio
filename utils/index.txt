@@ -1,0 +1,28 @@
+#######################
+#### Start of File ####
+####################### 
+----------------------------------------------------------------- 
+Contents: Listing of the utils directory.
+----------------------------------------------------------------- 
+as2htm - ASCII to HTML converter.
+
+as2ps - ASCII to PostScript converter.
+
+codegen - Software registration code generator utility.
+
+db_debug - 32/64-bit database file debug utility.
+
+edsdump - Encrypted configuration manager utility. 
+
+ffind - File find/string replace utility.
+
+hexdump - HEX file dump/edit program.
+
+ix_debug - 32/64-bit B-tree index file debug utility.
+
+txfilter - Text file filter utility.
+----------------------------------------------------------------- 
+#####################
+#### End of File ####
+#####################
+

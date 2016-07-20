@@ -1,0 +1,2 @@
+PROJECT = client
+include ../../env/hpux11.mak

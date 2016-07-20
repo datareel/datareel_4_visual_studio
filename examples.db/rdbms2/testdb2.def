@@ -1,0 +1,39 @@
+# Relational database table definition file
+
+DEFINE TABLE {
+testdb2,
+VChar Test{25}   VCHAR,
+Char Test{25}    CHAR[25],
+Bool test{1}     BOOL.Y,
+Int16 test{2}    INT16,
+Int32 test{12}   INT32,
+Int64 test{19}   INT64,
+Float test{5}    FLOAT.5,
+Currency test{5} CURRENCY.D,
+Date test{8}     DATE,
+Binary test{0}   BINARY,
+Blob test{0}     BLOB
+};
+
+DEFINE KEYS {
+PRI: COL 1,
+ATTRIB: NOCASE,
+ATTRIB: ANCOMPARE
+};
+
+DEFINE FAMILY {
+NONE
+};
+
+DEFINE FKEY {
+NONE
+}
+
+DEFINE USER ACCESS {
+*.*
+};
+
+DEFINE GROUP ACCESS {
+*.*
+};
+

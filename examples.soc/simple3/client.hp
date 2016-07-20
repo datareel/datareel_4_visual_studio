@@ -1,0 +1,53 @@
+#######################
+#### Start of File ####
+#######################
+# --------------------------------------------------------------- 
+# Makefile Contents: Makefile for the test program
+# C/C++ Compiler Used: HP C++ A.10.09  compiled for HP-UX 10.20 
+# Produced By: DataReel Software Development Team
+# File Creation Date: 09/20/1999
+# Date Last Modified: 01/01/2009
+# --------------------------------------------------------------- 
+SHELL = /bin/sh
+
+# Define a name for the executable
+PROJECT = client
+
+OBJ_EXT = .o
+
+# Macros used to define conditional directives
+DEFMACS = -D__UNIX__ -D__HPUX__
+
+ADD_INC_PATHS = -I../../include
+
+# Define macros for compiler and linker
+CC = cc
+LINKER = ld
+
+# Define compiler and linker flags macros
+COMPILE_FLAGS= $(COM_FLAGS) $(ADD_INC_PATHS) $(DEFMACS)
+COMPILE_ONLY = -c
+OUTPUT = -o
+LFLAGS = -lm
+
+include project.mak
+
+$(PROJECT):	$(OBJECTS)
+	$(CPP) $(COMPILE_FLAGS) $(OBJECTS) $(OUTPUT) $(PROJECT) 
+# ===============================================================
+
+# Remove object files and the executable after running make 
+# ===============================================================
+clean:
+	echo Removing all OBJECT files from working directory...
+	rm -f *.o 
+
+	echo Removing template repository from working directory...
+	rm -r -f ptrepository
+
+	echo Removing EXECUTABLE file from working directory...
+	rm -f $(PROJECT)
+# --------------------------------------------------------------- 
+#####################
+#### End of File ####
+#####################
