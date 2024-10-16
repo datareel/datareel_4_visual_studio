@@ -1,0 +1,167 @@
+<!doctype html>
+<!-- ******************************* -->
+<!-- ******** Start of Page ******** -->
+<!-- ******************************* -->
+<!-- *********************************************************** -->
+<!-- HTML Page -->
+<!-- Designed For: FireFox, Chrome, Safari -->
+<!-- Published By: DataReel Software Development -->
+<!-- Content Last Modified: 01/15/2024 -->
+<!-- File Creation Date: 01/15/2024 20:36:35 EST -->
+<!-- *** -->
+<!-- Package version: 12.3.10 -->
+<!-- *** -->
+<!-- Copyright (c) 1999-2024 DataReel Software Development -->
+<!-- *********************************************************** -->
+<!-- *********** HTML Page Description and Details ************* -->
+<!-- *********************************************************** -->
+<!-- *** -->
+<!-- START OF LICENSING AND DISCLAIMER AGREEMENT -->
+<!-- *** -->
+<!-- This HTML page and its derivatives are copyright (c) 1999-2024, by -->
+<!-- DataReel Software Development. This HTML page and any derivative Web -->
+<!-- objects are published on the Internet for public viewing only. -->
+<!-- Reproduction of any HTML page and/or Web objects published on -->
+<!-- this Website is prohibited unless authorized in writing by -->
+<!-- DataReel Software Development or authorized reseller. Reproduction of any -->
+<!-- third party code used to produce pages on this Website is subject to -->
+<!-- the third party licensing and distribution agreement. -->
+<!-- *** -->
+<!-- THIS SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND. THE -->
+<!-- ENTIRE RISK OF THE QUALITY AND PERFORMANCE OF THIS SOFTWARE IS WITH -->
+<!-- YOU. SHOULD ANY ELEMENT OF THIS SOFTWARE PROVE DEFECTIVE, YOU WILL -->
+<!-- ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION. -->
+<!-- *** -->
+<!-- *********************************************************** -->
+<!-- *************** THIRD PARTY ACKNOWLEDGMENT **************** -->
+<!-- *********************************************************** -->
+<!-- *** -->
+<!-- NONE -->
+<!-- *** -->
+<!-- END OF LICENSING AND DISCLAIMER AGREEMENT -->
+<!-- *** -->
+<!-- HTML Internet page -->
+<!-- *********************************************************** -->
+<!-- PAGE CONTENT STARTS BELOW -->
+
+<html lang="en" data-bs-theme="auto">
+  <head>
+<!--HEADSTART-->
+<!--HEADEND-->
+    <title>file_h example</title>
+    </head>
+    <body>
+
+
+
+<FONT FACE="Courier New" SIZE=3><PRE>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// -------- Start of File -------- //</FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">// C++ Header File Name: gxsfile.h</FONT>
+<FONT COLOR="#ff0000">// C++ Compiler Used: MSVC, BCC32, GCC, HPUX aCC, SOLARIS CC</FONT>
+<FONT COLOR="#ff0000">// Produced By: DataReel Software Development Team</FONT>
+<FONT COLOR="#ff0000">// File Creation Date: 09/20/1999</FONT>
+<FONT COLOR="#ff0000">// Date Last Modified: 06/17/2016</FONT>
+<FONT COLOR="#ff0000">// Copyright (c) 2001-2024 DataReel Software Development</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">// ---------- Include File Description and Details  ---------- // </FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">/*
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+ 
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  
+USA
+
+The gxsFile class is used to move data to and from disk
+files using the device cache.
+*/</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+#ifndef __GXS_FILE_HPP__
+#define __GXS_FILE_HPP__
+
+#include "gxdlcode.h"
+
+#include &lt;stdlib.h&gt;
+#include "devcache.h"
+#include "membuf.h"
+#include "memblock.h"
+#include "gxstream.h"
+#include "gxdatagm.h"
+#include "scomserv.h"
+#include "dfileb.h"
+
+class gxsFile : public gxDeviceCache
+{
+public:
+  gxsFile(int CacheSize = 1024);
+  ~gxsFile() { }
+
+public:
+  void DeviceErrorHandler(const char *mesg);
+  void Flush(); <FONT COLOR="#ff0000">// Flush the cache buckets to the output device</FONT>
+  unsigned BucketsInUse() { return cache.BucketsInUse(); }
+  void CloseOutputFile();
+  void CloseInputFile();
+  int OpenInputFile(const char *in);
+  int OpenOutputFile(const char *out);
+  FAU_t LoadFile(gxDeviceCachePtr p, FAU_t end_of_file);
+  int CopyFileToFile(FAU_t &amp;byte_count);
+  int CopyFileToStreamSocket(gxStream *s, FAU_t &amp;byte_count);
+  int CopyFileToDatagramSocket(gxDatagram *s, FAU_t &amp;byte_count);
+  int CopyFileToSerialPort(gxSerialCommServer *s, FAU_t &amp;byte_count);
+  int CopyStreamSocketToFile(gxStream *s, gxBlockHeader &amp;gxs);
+  int CopyDatagramSocketToFile(gxDatagram *s, gxBlockHeader &amp;gxs);
+  int CopySerialPortToFile(gxSerialCommServer *s, gxBlockHeader &amp;gxs);
+
+private: <FONT COLOR="#ff0000">// Base class interface</FONT>
+  void Read(void *buf, unsigned Bytes, gxDeviceTypes dev);
+  void Write(const void *buf, unsigned Bytes, gxDeviceTypes dev);
+
+private: <FONT COLOR="#ff0000">// Device objects</FONT>
+  DiskFileB outfile;               <FONT COLOR="#ff0000">// File used to output data</FONT>
+  DiskFileB infile;                <FONT COLOR="#ff0000">// File used to input data</FONT>
+  gxStream *stream_sock;           <FONT COLOR="#ff0000">// Stream socket (network device) </FONT>
+  gxDatagram *datagram_sock;       <FONT COLOR="#ff0000">// Datagram socket (network device)</FONT>
+  gxSerialCommServer *serial_port; <FONT COLOR="#ff0000">// Serial port (RS232 device)</FONT>
+
+private: <FONT COLOR="#ff0000">// Temporary variables used during read/write operations</FONT>
+  gxBlockHeader curr_stream_hdr;
+  gxBlockHeader curr_datagram_hdr;
+  gxBlockHeader curr_serial_hdr;
+
+private: <FONT COLOR="#ff0000">// Device cache</FONT>
+  gxDeviceBucketCache cache;
+
+public: <FONT COLOR="#ff0000">// Functions used to get the current device cache</FONT>
+  gxDeviceBucketCache *GetCache() { return &amp;cache; }
+};
+
+#endif <FONT COLOR="#ff0000">// __GXS_FILE_HPP__</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// --------- End of File --------- //</FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+
+</PRE></FONT>
+
+
+  </body>
+</html>
+
+<!-- PAGE CONTENT ENDS ABOVE -->
+<!-- *********************************************************** -->
+<!-- ******************************* -->
+<!-- ********* End of Page ********* -->
+<!-- ******************************* -->

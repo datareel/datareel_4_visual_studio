@@ -1,0 +1,214 @@
+<!doctype html>
+<!-- ******************************* -->
+<!-- ******** Start of Page ******** -->
+<!-- ******************************* -->
+<!-- *********************************************************** -->
+<!-- HTML Page -->
+<!-- Designed For: FireFox, Chrome, Safari -->
+<!-- Published By: DataReel Software Development -->
+<!-- Content Last Modified: 01/15/2024 -->
+<!-- File Creation Date: 01/15/2024 20:41:05 EST -->
+<!-- *** -->
+<!-- Package version: 12.3.10 -->
+<!-- *** -->
+<!-- Copyright (c) 1999-2024 DataReel Software Development -->
+<!-- *********************************************************** -->
+<!-- *********** HTML Page Description and Details ************* -->
+<!-- *********************************************************** -->
+<!-- *** -->
+<!-- START OF LICENSING AND DISCLAIMER AGREEMENT -->
+<!-- *** -->
+<!-- This HTML page and its derivatives are copyright (c) 1999-2024, by -->
+<!-- DataReel Software Development. This HTML page and any derivative Web -->
+<!-- objects are published on the Internet for public viewing only. -->
+<!-- Reproduction of any HTML page and/or Web objects published on -->
+<!-- this Website is prohibited unless authorized in writing by -->
+<!-- DataReel Software Development or authorized reseller. Reproduction of any -->
+<!-- third party code used to produce pages on this Website is subject to -->
+<!-- the third party licensing and distribution agreement. -->
+<!-- *** -->
+<!-- THIS SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND. THE -->
+<!-- ENTIRE RISK OF THE QUALITY AND PERFORMANCE OF THIS SOFTWARE IS WITH -->
+<!-- YOU. SHOULD ANY ELEMENT OF THIS SOFTWARE PROVE DEFECTIVE, YOU WILL -->
+<!-- ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION. -->
+<!-- *** -->
+<!-- *********************************************************** -->
+<!-- *************** THIRD PARTY ACKNOWLEDGMENT **************** -->
+<!-- *********************************************************** -->
+<!-- *** -->
+<!-- NONE -->
+<!-- *** -->
+<!-- END OF LICENSING AND DISCLAIMER AGREEMENT -->
+<!-- *** -->
+<!-- HTML Internet page -->
+<!-- *********************************************************** -->
+<!-- PAGE CONTENT STARTS BELOW -->
+
+<html lang="en" data-bs-theme="auto">
+  <head>
+<!--HEADSTART-->
+<!--HEADEND-->
+    <title>sslservh example</title>
+    </head>
+    <body>
+
+
+
+<FONT FACE="Courier New" SIZE=3><PRE>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// -------- Start of File -------- //</FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// C++ Header File Name: m_thread.h</FONT>
+<FONT COLOR="#ff0000">// C++ Compiler Used: MSVC, GCC</FONT>
+<FONT COLOR="#ff0000">// Produced By: DataReel Software Development Team</FONT>
+<FONT COLOR="#ff0000">// File Creation Date: 10/17/2001</FONT>
+<FONT COLOR="#ff0000">// Date Last Modified: 06/17/2016</FONT>
+<FONT COLOR="#ff0000">// Copyright (c) 2001-2024 DataReel Software Development</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">// ---------- Include File Description and Details  ---------- // </FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">/*
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+ 
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  
+USA
+
+Multi-threaded server framework using the gxSSL and gxThread 
+libraries.
+*/</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- //   </FONT>
+#ifndef __GX_S_MTHREAD_SERVER_HPP__
+#define __GX_S_MTHREAD_SERVER_HPP__
+
+#include "gxdlcode.h"
+
+#include "gxmutex.h"
+#include "gxcond.h"
+#include "gxthread.h"
+#include "gxsocket.h"
+#include "futils.h"
+#include "gxssl.h"
+
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+<FONT COLOR="#ff0000">// Constants</FONT>
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+<FONT COLOR="#ff0000">// Thread constants</FONT>
+const int DISPLAY_THREAD_RETRIES = 3;
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+
+<FONT COLOR="#ff0000">// Server configuration</FONT>
+struct  ServerConfig {
+  ServerConfig();
+  ~ServerConfig();
+  
+  <FONT COLOR="#ff0000">// Server configuration variables</FONT>
+  gxsPort_t port;     <FONT COLOR="#ff0000">// Server's port number</FONT>
+  int accept_clients; <FONT COLOR="#ff0000">// True while accepting </FONT>
+
+  <FONT COLOR="#ff0000">// gxThread variables</FONT>
+  thrPool *client_request_pool; <FONT COLOR="#ff0000">// Worker threads processing client requests</FONT>
+
+  <FONT COLOR="#ff0000">// gxThread synchronization interface</FONT>
+  gxMutex display_lock;      <FONT COLOR="#ff0000">// Mutex object used to lock the display</FONT>
+  gxCondition display_cond;  <FONT COLOR="#ff0000">// Condition variable used with the display lock</FONT>
+  int display_is_locked;     <FONT COLOR="#ff0000">// Display lock Boolean predicate</FONT>
+};
+
+<FONT COLOR="#ff0000">// Client socket type used to associate client sockets other</FONT>
+<FONT COLOR="#ff0000">// data types.</FONT>
+struct ClientSocket_t
+{
+  ClientSocket_t() { 
+    client_socket = -1;
+    openssl = 0;
+  }
+  ~ClientSocket_t() { FreeSSL(); }
+
+  void FreeSSL();
+
+  gxsSocket_t client_socket; <FONT COLOR="#ff0000">// Client socket</FONT>
+  gxSSL *openssl; <FONT COLOR="#ff0000">// Open SSL object</FONT>
+};
+
+class ClientRequestThread : public gxSocket, public gxThread
+{
+public:
+  ClientRequestThread() { }
+  ~ClientRequestThread() { }
+
+public: <FONT COLOR="#ff0000">// Client routines</FONT>
+  void HandleClientRequest(ClientSocket_t *s);
+
+private: <FONT COLOR="#ff0000">// gxThread Interface</FONT>
+  void *ThreadEntryRoutine(gxThread_t *thread);
+  void ThreadExitRoutine(gxThread_t *thread);
+  void ThreadCleanupHandler(gxThread_t *thread);
+};
+
+class ServerThread : public gxSocket, public gxThread
+{
+public:
+  ServerThread() { }
+  ~ServerThread() { }
+
+public: <FONT COLOR="#ff0000">// Server functions</FONT>
+  int InitServer(int max_connections = SOMAXCONN);
+
+private: <FONT COLOR="#ff0000">// gxThread Interface</FONT>
+  void *ThreadEntryRoutine(gxThread_t *thread);
+  void ThreadExitRoutine(gxThread_t *thread);
+  void ThreadCleanupHandler(gxThread_t *thread);
+  
+public: <FONT COLOR="#ff0000">// Server data members</FONT>
+  ClientRequestThread request_thread;
+  gxSSL openssl;
+};
+
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+<FONT COLOR="#ff0000">// Standalone functions</FONT>
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+void PrintMessage(const char *s1 = " ", const char *s2 = " ", 
+		  const char *s3 = " ");
+void ReportError(const char *s1 = " ", const char *s2 = " ", 
+		 const char *s3 = " ");
+int CheckSocketError(gxSocket *s, const char *mesg = 0, 
+		     int report_error = 1);
+int CheckThreadError(gxThread_t *thread, const char *mesg = 0, 
+		     int report_error = 1);
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+<FONT COLOR="#ff0000">// Globals configuration variables</FONT>
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+extern ServerConfig ServerConfigSruct;
+extern ServerConfig *servercfg;
+<FONT COLOR="#ff0000">// --------------------------------------------------------------</FONT>
+
+#endif <FONT COLOR="#ff0000">// __GX_S_MTHREAD_SERVER_HPP__</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// --------- End of File --------- //</FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+
+</PRE></FONT>
+
+
+  </body>
+</html>
+
+<!-- PAGE CONTENT ENDS ABOVE -->
+<!-- *********************************************************** -->
+<!-- ******************************* -->
+<!-- ********* End of Page ********* -->
+<!-- ******************************* -->

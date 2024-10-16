@@ -1,0 +1,206 @@
+<!doctype html>
+<!-- ******************************* -->
+<!-- ******** Start of Page ******** -->
+<!-- ******************************* -->
+<!-- *********************************************************** -->
+<!-- HTML Page -->
+<!-- Designed For: FireFox, Chrome, Safari -->
+<!-- Published By: DataReel Software Development -->
+<!-- Content Last Modified: 01/15/2024 -->
+<!-- File Creation Date: 01/15/2024 20:41:32 EST -->
+<!-- *** -->
+<!-- Package version: 12.3.10 -->
+<!-- *** -->
+<!-- Copyright (c) 1999-2024 DataReel Software Development -->
+<!-- *********************************************************** -->
+<!-- *********** HTML Page Description and Details ************* -->
+<!-- *********************************************************** -->
+<!-- *** -->
+<!-- START OF LICENSING AND DISCLAIMER AGREEMENT -->
+<!-- *** -->
+<!-- This HTML page and its derivatives are copyright (c) 1999-2024, by -->
+<!-- DataReel Software Development. This HTML page and any derivative Web -->
+<!-- objects are published on the Internet for public viewing only. -->
+<!-- Reproduction of any HTML page and/or Web objects published on -->
+<!-- this Website is prohibited unless authorized in writing by -->
+<!-- DataReel Software Development or authorized reseller. Reproduction of any -->
+<!-- third party code used to produce pages on this Website is subject to -->
+<!-- the third party licensing and distribution agreement. -->
+<!-- *** -->
+<!-- THIS SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND. THE -->
+<!-- ENTIRE RISK OF THE QUALITY AND PERFORMANCE OF THIS SOFTWARE IS WITH -->
+<!-- YOU. SHOULD ANY ELEMENT OF THIS SOFTWARE PROVE DEFECTIVE, YOU WILL -->
+<!-- ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION. -->
+<!-- *** -->
+<!-- *********************************************************** -->
+<!-- *************** THIRD PARTY ACKNOWLEDGMENT **************** -->
+<!-- *********************************************************** -->
+<!-- *** -->
+<!-- NONE -->
+<!-- *** -->
+<!-- END OF LICENSING AND DISCLAIMER AGREEMENT -->
+<!-- *** -->
+<!-- HTML Internet page -->
+<!-- *********************************************************** -->
+<!-- PAGE CONTENT STARTS BELOW -->
+
+<html lang="en" data-bs-theme="auto">
+  <head>
+<!--HEADSTART-->
+<!--HEADEND-->
+    <title>cond1 example</title>
+    </head>
+    <body>
+
+
+
+<FONT FACE="Courier New" SIZE=3><PRE>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// -------- Start of File -------- //</FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">// C++ Source Code File Name: testprog.cpp</FONT>
+<FONT COLOR="#ff0000">// Compiler Used: MSVC, BCC32, GCC, HPUX aCC, SOLARIS CC</FONT>
+<FONT COLOR="#ff0000">// Produced By: DataReel Software Development Team</FONT>
+<FONT COLOR="#ff0000">// File Creation Date: 03/25/2000</FONT>
+<FONT COLOR="#ff0000">// Date Last Modified: 06/17/2016</FONT>
+<FONT COLOR="#ff0000">// Copyright (c) 2001-2024 DataReel Software Development</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">// ------------- Program Description and Details ------------- // </FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">/*
+This library is free software; you can redistribute it and/or 
+modify it under the terms of the GNU Lesser General Public 
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version. 
+  
+This library is distributed in the hope that it will be useful, 
+but WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+Lesser General Public License for more details.
+ 
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+ 
+Simple test program demonstrating the basic operation of the
+gxThread class using condition variables.
+*/</FONT>
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- //   </FONT>
+#include "gxdlcode.h"
+
+#if defined (__USE_ANSI_CPP__) <FONT COLOR="#ff0000">// Use the ANSI Standard C++ library</FONT>
+#include &lt;iostream&gt;
+using namespace std; <FONT COLOR="#ff0000">// Use unqualified names for Standard C++ library</FONT>
+#else <FONT COLOR="#ff0000">// Use the old iostream library by default</FONT>
+#include &lt;iostream.h&gt;
+#endif <FONT COLOR="#ff0000">// __USE_ANSI_CPP__</FONT>
+
+#include "gxthread.h"
+#include "gxcond.h"
+#include "gxmutex.h"
+
+#ifdef __MSVC_DEBUG__
+#include "leaktest.h"
+#endif
+
+<FONT COLOR="#ff0000">// For safe condition variable usage, must use a Boolean predicate and </FONT>
+<FONT COLOR="#ff0000">// a mutex with the condition.</FONT>
+int is_locked = 0;
+gxCondition cond;
+gxMutex mutex;
+
+class SimpleThread : public gxThread
+{
+private: <FONT COLOR="#ff0000">// Base class interface</FONT>
+  void *ThreadEntryRoutine(gxThread_t *thread);
+};
+
+void *SimpleThread::ThreadEntryRoutine(gxThread_t *thread)
+<FONT COLOR="#ff0000">// Thread's entry function</FONT>
+{
+  int num = *((int *)thread-&gt;GetThreadParm());
+
+  <FONT COLOR="#ff0000">// Serialize access to the shared resource.</FONT>
+  mutex.MutexLock();
+  
+  int num_try = 0;
+  while(is_locked != 0) {
+    if(++num_try &lt; 255) {
+      cout &lt;&lt; "Thread " &lt;&lt; num &lt;&lt; " execution blocked..." &lt;&lt; "\n" &lt;&lt; flush;
+      cond.ConditionWait(&amp;mutex);
+    }
+    else {
+      cout &lt;&lt; "Thread " &lt;&lt; num &lt;&lt; " could not wait for condition" 
+	   &lt;&lt; "\n" &lt;&lt; flush;
+      mutex.MutexUnlock();
+      return 0;
+    }
+  }
+
+  <FONT COLOR="#ff0000">// Tell other threads to wait until shared resource is available</FONT>
+  is_locked = 1;
+
+  <FONT COLOR="#ff0000">// ********** Enter Critical Section ******************* //</FONT>
+  cout &lt;&lt; "Thread " &lt;&lt; num &lt;&lt; " accesing shared resource" &lt;&lt; "\n" &lt;&lt; flush;
+  <FONT COLOR="#ff0000">// ...</FONT>
+  <FONT COLOR="#ff0000">// ...</FONT>
+  <FONT COLOR="#ff0000">// ...</FONT>
+  cout &lt;&lt; "Thread " &lt;&lt; num &lt;&lt; " releasing shared resource" &lt;&lt; "\n" &lt;&lt; flush;
+  <FONT COLOR="#ff0000">// ********** Leave Critical Section ******************* //</FONT>
+
+  <FONT COLOR="#ff0000">// Tell other threads shared resource is available</FONT>
+  is_locked = 0;
+
+  <FONT COLOR="#ff0000">// Wake up the next thread waiting on this condition</FONT>
+  cond.ConditionSignal();
+  mutex.MutexUnlock();
+  
+  return 0;
+}
+
+int main(int argc, char **argv)
+{
+#ifdef __MSVC_DEBUG__
+  InitLeakTest();
+#endif
+
+  const int NUM_THREADS = 5;
+  SimpleThread t;
+  gxThread_t *thread[NUM_THREADS];
+
+  cout &lt;&lt; "Create " &lt;&lt; NUM_THREADS &lt;&lt; " threads" &lt;&lt; "\n" &lt;&lt; flush;
+  int i;
+  for(i = 0; i &lt; NUM_THREADS; i++) thread[i] = t.CreateThread((void *)&amp;i); 
+
+  <FONT COLOR="#ff0000">// Wait for the all the threads to finish before exiting</FONT>
+  cout &lt;&lt; "Waiting for all threads before exiting" &lt;&lt; "\n" &lt;&lt; flush;
+  for(i = 0; i &lt; NUM_THREADS; ++i) t.JoinThread(thread[i]);
+
+  <FONT COLOR="#ff0000">// Release the memory allocated for each thread</FONT>
+  for(i = 0; i &lt; NUM_THREADS; ++i) delete thread[i];
+
+  cout &lt;&lt; "Exiting program" &lt;&lt; "\n" &lt;&lt; flush;
+  return 0;
+}
+<FONT COLOR="#ff0000">// ----------------------------------------------------------- // </FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+<FONT COLOR="#ff0000">// --------- End of File --------- //</FONT>
+<FONT COLOR="#ff0000">// ------------------------------- //</FONT>
+
+
+  
+
+
+</PRE></FONT>
+
+
+  </body>
+</html>
+
+<!-- PAGE CONTENT ENDS ABOVE -->
+<!-- *********************************************************** -->
+<!-- ******************************* -->
+<!-- ********* End of Page ********* -->
+<!-- ******************************* -->
