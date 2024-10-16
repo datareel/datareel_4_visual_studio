@@ -1,8 +1,0 @@
-$(PROJECT)$(OBJ_EXT):	$(PROJECT).cpp $(PROJECT_DEP)
-	$(CPP) $(COMPILE_ONLY) $(COMPILE_FLAGS) $(PROJECT).cpp
-
-hxcrc$(OBJ_EXT):	hxcrc.cpp $(HXCRC_DEP)
-	$(CPP) $(COMPILE_ONLY) $(COMPILE_FLAGS) hxcrc.cpp
-
-OBJECTS = $(PROJECT)$(OBJ_EXT) hxcrc$(OBJ_EXT)
-

@@ -1,6 +1,0 @@
-
---- Module:   client.cpp
-                                                      _
-  unsigned short port = (unsigned short) atoi(argv[2]);
-client.cpp(250) : Warning 421: Caution -- function 'atoi(const char *)' is
-    considered dangerous [MISRA Rule 125]
